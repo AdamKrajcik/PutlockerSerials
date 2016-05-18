@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "Putlocker Serials",
+  "short_name": "PutlockerSerials",
+  "description": "",
+  "version": "0.0.1",
+  "minimum_chrome_version": "38",
+  
+  "icons": {
+    "128": "assets/icon_128.png"
+  },
+  
+  "permissions": [
+    "http://www.google.com/",
+    "http://*/",
+    "storage"
+    ],
+
+  "browser_action": {
+    "default_popup": "page.html"
+  }
+}

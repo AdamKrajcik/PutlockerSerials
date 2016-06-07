@@ -32,10 +32,10 @@ function generateSerialList() {
 
 function findLastEpisode(name) {
   var season = 1, episode = 1, tmp = 0;
-  initEpisode(name, season, episode, tmp);
+  loadNextEpisode(name, season, episode, tmp);
 }
 
-function initEpisode(name, season, episode, tmp) {
+function loadNextEpisode(name, season, episode, tmp) {
   var xmlhttp;
   
   if (window.XMLHttpRequest)
@@ -49,9 +49,10 @@ function initEpisode(name, season, episode, tmp) {
   
   xmlhttp.onreadystatechange = function() {
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+      //doc = (new DOMParser).parseFromString(xmlhttp.responseText,"text/html");
       tmp = episode;
       episode++;
-      initEpisode(name, season, episode, tmp);
+      loadNextEpisode(name, season, episode, tmp);
     } else if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
       if (episode == 1) {
         season--;
@@ -59,8 +60,14 @@ function initEpisode(name, season, episode, tmp) {
         
         var curr = { name : name,
                      fullName : name,
-                     episode : episode,
-          season : season
+                     watched : { episode : episode,
+                                 season : season
+                     },
+                     seen : {
+                       seen : false,
+                       episode : episode,
+                       season : season
+                     }
                    };
                    serialList.push(curr);
         console.log(curr);
@@ -68,7 +75,7 @@ function initEpisode(name, season, episode, tmp) {
       } else {
         season++;
         episode = 1;
-        initEpisode(name, season, episode, tmp);
+        loadNextEpisode(name, season, episode, tmp);
       }
     }
   };
@@ -77,16 +84,18 @@ function initEpisode(name, season, episode, tmp) {
   xmlhttp.send();
 }
 
+// show new episodes since watched
+
 function checkForNew() {
   document.getElementById('tb').innerHTML = '';
   for(var i = 0; i < serialList.length; i++) {
-    var season = serialList[i].season;
-    var episode = serialList[i].episode + 1;
-    loadNextEpisode(serialList[i].name, season, episode);
+    var season = serialList[i].watched.season;
+    var episode = serialList[i].watched.episode + 1;
+    loadNextEpisode2(serialList[i].name, season, episode);
   }
 }
 
-function loadNextEpisode(name, season, episode) {
+function loadNextEpisode2(name, season, episode) {
 
   var xmlhttp;
   
@@ -121,8 +130,8 @@ function loadNextEpisode(name, season, episode) {
       td = document.createElement('td');
       bt.innerHTML = 'Watched';
       bt.addEventListener('click', function() { var s = findSerialInArray(name);
-                                                s.episode = episode;
-                                                s.season = season;
+                                                s.watched.episode = episode;
+                                                s.watched.season = season;
                                                 bt.disabled = true;
                                               }
                           );
@@ -131,13 +140,13 @@ function loadNextEpisode(name, season, episode) {
       
       document.getElementById('tb').appendChild(tr);
       
-      loadNextEpisode(name, season, episode + 1);
+      loadNextEpisode2(name, season, episode + 1);
     } else if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
       if (episode === 1) {
       } else {
         season++;
         episode = 1;
-        loadNextEpisode(name, season, episode);
+        loadNextEpisode2(name, season, episode);
       }
     }
   };
@@ -147,19 +156,8 @@ function loadNextEpisode(name, season, episode) {
 }
 
 // CRUD
-function createSerial(serial) {
-  serials.push(serial.name);
-  serialList.push(serial);
-}
 
-function updateSerial(linkName, serial) {
-  var ser = findSerialInArray(serial.name);
-  ser.fullName = serial.fullName;
-  ser.episode = serial.episode;
-  ser.season = serial.season;
-}
-
-function deleteSerial(linkName) {
+function deleteSerial(name) {
   var index = serials.indexOf(name);
   if (index >= 0) {
     serials.splice( index, 1 );
@@ -171,28 +169,61 @@ function deleteSerial(linkName) {
   }
 }
 
+function updateSerial(serial) {
+  var ser = findSerialInArray(serial.name);
+  ser.fullName = serial.fullName;
+  ser.watched.episode = serial.watched.episode;
+  ser.watched.season = serial.watched.season;
+  ser.seen.seen = serial.seen.seen;
+  ser.seen.episode = serial.seen.episode;
+  ser.seen.season = serial.seen.season;
+}
+
+
+function createSerialM(serial) {
+  serials.push(serial.name);
+  serialList.push({ name : serial.name,
+                    fullName : serial.fullName,
+                    watched : { episode : serial.watched.episode,
+                             season : serial.watched.season },
+                    seen : { seen : serial.seen.seen,
+                             episode : serial.seen.episode,
+                             season : serial.seen.season }
+  });
+}
+
+// TODO add function to set watched to last episode
+function createSerialA(serial) {
+  serials.push(serial.name);
+  serialList.push({ name : serial.name,
+                    fullName : serial.fullName,
+                    watched : { episode : serial.watched.episode,
+                             season : serial.watched.season },
+                    seen : { seen : serial.seen.seen,
+                             episode : serial.seen.episode,
+                             season : serial.seen.season }
+  });
+} 
+
+
 function generateMainMenu() {
   var btn;
   var menu = document.getElementById('menu');
   
   btn = document.createElement('button');
-  btn.innerHTML = 'Serials';
-  btn.addEventListener('click',function() { generateSerialMenu(); generateSerialsTable();});
+  btn.innerHTML = 'Last watched';
+  btn.addEventListener('click',generateTable);
   menu.appendChild(btn);
   
   btn = document.createElement('button');
-  btn.innerHTML = 'Last';
-  btn.addEventListener('click',generateLastTable);
-  menu.appendChild(btn);
-  
-  btn = document.createElement('button');
-  btn.innerHTML = 'Latest';
+  btn.innerHTML = 'Check new';
   btn.addEventListener('click',checkForNew);
   menu.appendChild(btn);
   
-  //will be removed when ready when not needed
+  
+  //will be removed when ready
   btn = document.createElement('button');
-  btn.innerHTML = 'S';
+  btn.innerHTML = 'Save';
   btn.addEventListener('click', save);
   menu.appendChild(btn);
 }
@@ -203,45 +234,32 @@ function generateSerialMenu() {
   var menu = document.getElementById('submenu');
   
   btn = document.createElement('button');
-  btn.innerHTML = 'New';
-    btn.addEventListener('click', function () {
-        
-    });
+  btn.innerHTML = 'Add';
   menu.appendChild(btn);
-    
+  
+  btn = document.createElement('button');
+  btn.innerHTML = 'Update';
+  menu.appendChild(btn);
+  
+  btn = document.createElement('button');
+  btn.innerHTML = 'Delete';
+  menu.appendChild(btn);
+  
   btn = document.createElement('button');
   btn.innerHTML = 'Back';
   menu.appendChild(btn);
   
   btn = document.createElement('button');
-  btn.innerHTML = 'Import';
+  btninnerHTML = 'Import';
   menu.appendChild(btn);
 }
 
-function generateSerialsTable() {
-  var tb = document.getElementById('tb');
-  var tr;
-  var td;
-  
-  tb.innerHTML = '';
-  
-  for (var i = 0; i < serialList.length; i++) {
-    tr = document.createElement('tr');
-    
-    td = document.createElement('td');
-    td.innerHTML =  serialList[i].fullName;
-    
-    tr.appendChild(td);
-    tb.appendChild(tr);
-  }
-}
-
-function generateLastTable() {
+function generateTable() {
   var table = '<table>';
   
   for (var i = 0; i < serialList.length; i++) {
     table += '<tr><td>';
-    table += serialList[i].fullName  + '</td><td> Ep ' + serialList[i].episode + '</td><td> Se ' + serialList[i].season;
+    table += serialList[i].fullName  + '</td><td> Ep ' + serialList[i].watched.episode + '</td><td> Se ' + serialList[i].watched.season;
     table += '</td></tr>';
   }
   
@@ -253,127 +271,18 @@ function generateSerials() {
   serials = ['ncis', 'limitless', 'castle', 'agents-of-shield', 'madam-secretary', 'the-blacklist', 'elementary', 'forever', 'scorpion', 'ncis-los-angeles', 'ncis-new-orleans', 'hawaii-five-0', 'blindspot', 'agent-x'];
 }
 
-function findSerialInArray(linkName) {
+function findSerialInArray(name) {
   for (var i = 0; i < serialList.length; i++) {
-    if(linkName === serialList[i].linkName) {
+    if(name === serialList[i].name) {
       return serialList[i];
     }
   }
 }
 
 function save() {
-  //noinspection JSUnresolvedVariable
   chrome.storage.local.set( {'serials' : serials, 'serialList' : serialList }, function () { console.log('saved ' + Date()); });
 }
 
-function createLink(linkName, season, episode) {
-  return 'http://putlocker.is/watch-' + linkName + '-tvshow-season-' + season + '-episode-' + episode + '-online-free-putlocker.html';
-}
-
-function fullName(serial) {
-  var xmlhttp;
-  var patt = "Watch (.+) Season";
-  
-  if (window.XMLHttpRequest)
-  {
-    xmlhttp = new XMLHttpRequest();
-  } 
-  else
-  {
-    xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-  }
-  
-  xmlhttp.onreadystatechange = function() {
-    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-      var doc = (new DOMParser()).parseFromString(xmlhttp.responseText,"text/html");
-      var fullName = doc.getElementById('title').match(patt)[1];
-      serial.fullName = fullName;
-    } 
-  };
-  
-  xmlhttp.open('GET', createLink(serial.linkName, 1, 1), true);
-  xmlhttp.send();
-}
-
-function linkName(serial) {
-  serial.linkName = serial.fullName.replace(/\W+/g, '-').toLowerCase();
-}
-
-function createForm(serial) {
-    var form = document.createElement('div');
-    var span, inFullName, inLinkName, inSeason, inEpisode, checkbox;
-
-    span = document.createElement('span');
-    span.innerHTML = 'Full name: ';
-    inFullName = document.createElement('input');
-    inFullName.type = 'text';
-    inFullName.name = 'fullname';
-    checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.name = 'checkFull';
-    form.appendChild(span);
-    form.appendChild(inFullName);
-    form.appendChild(checkbox);
-  
-    span = document.createElement('span');
-    span.innerHTML = 'Link name: ';
-    inLinkName = document.createElement('input');
-    inLinkName.type = 'text';
-    inLinkName.name = 'linkname';
-    checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.name = 'checkLink';
-    form.appendChild(span);
-    form.appendChild(inLinkName);
-    form.appendChild(checkbox);
-
-    span = document.createElement('span');
-    span.innerHTML = 'Episode: ';
-    inEpisode = document.createElement('input');
-    inEpisode.type = 'text';
-    inEpisode.name = 'episode';
-    form.appendChild(span);
-    form.appendChild(inEpisode);
-
-    span = document.createElement('span');
-    span.innerHTML = 'Season: ';
-    inSeason = document.createElement('input');
-    inSeason.type = 'text';
-    inSeason.name = 'season';
-    form.appendChild(span);
-    form.appendChild(inSeason);
-
-    checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.name = 'latest';
-  
-    var btn = document.createElement('button');
-    btn.id = 'submit';
-    btn.addEventListener('click', function () {
-        
-    });
-
-    if (serial === undefined || serial === null) {
-        return;
-    }
-    else {
-        inFullName.value = serial.fullName;
-        inLinkName.value = serial.linkName;
-        inEpisode.value = serial.episode;
-        inSeason.value = serial.season;
-    }
-}
-
-function clearPage() {
-    document.getElementById('subMenu').innerHTML = '';
-    document.getElementById('tb').innerHTML = '';
-    document.getElementById('serial').innerHTML = '';
-}
-
-function parseForm(form) {
-    var fullName, linkName, episode, season;
-
-    if (form.getElementsByName('fullName').value == '') {
-        alert('Error in fullName');
-    }
+function createLink(name, season, episode) {
+  return 'http://putlocker.is/watch-' + name + '-tvshow-season-' + season + '-episode-' + episode + '-online-free-putlocker.html';
 }

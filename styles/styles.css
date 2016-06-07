@@ -1,41 +1,4 @@
 /* CSS file placeholder. */
 body {
   width : 300px;
-  background-color: aliceblue;margin-left: 15px;
-}
-
-.menubutton {
-  width: 96px;
-  height: 30px;
-  background-color: gainsboro;
-  font-size: 20px;
-  display: inline-block;
-  text-align: center;
-  margin: 0px 1px 0px 1px;
-}
-
-.menubutton:hover {
-  background-color: deepskyblue;
-}
-
-.menu {
-  margin-top: 20px;
-  display: block;
-  height: 30px;
-
-}
-
-.submenu {
-  display: block;
-  height: 15px;
-}
-
-.submenubutton {
-  width: 96px;
-  height: 15px;
-  background-color: gainsboro;
-  font-size: 10px;
-  display: inline-block;
-  text-align: center;
-  margin: 0px 1px 0px 1px;
 }

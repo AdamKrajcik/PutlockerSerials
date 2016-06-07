@@ -1,0 +1,5 @@
+var Utils = {
+    createLink : function () {
+        
+    }
+}

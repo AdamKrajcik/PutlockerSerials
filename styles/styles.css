@@ -19,10 +19,8 @@ body {
 }
 
 .menu {
-  margin-top: 20px;
   display: block;
   height: 30px;
-
 }
 
 .submenu {
@@ -38,4 +36,25 @@ body {
   display: inline-block;
   text-align: center;
   margin: 0px 1px 0px 1px;
+}
+
+.submenubutton:hover {
+  background-color: deepskyblue;
+}
+
+td.tableitem {
+
+}
+
+td.tableitem:hover {
+
+}
+
+.form {
+  padding : 6px 0px 10px 20px;
+  display: block;
+}
+
+#main {
+  margin-top: 5px;
 }

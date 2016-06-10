@@ -5,8 +5,8 @@ body {
   margin-left: 15px;
 }
 
-.menubutton {
-  width: 145px;
+.largemenubutton {
+  width: 130px;
   height: 30px;
   background-color: gainsboro;
   font-size: 20px;
@@ -15,7 +15,21 @@ body {
   margin: 0px 1px 0px 1px;
 }
 
-.menubutton:hover {
+.smallmenubutton {
+  width: 30px;
+  height: 30px;
+  background-color: gainsboro;
+  font-size: 20px;
+  display: inline-block;
+  text-align: center;
+  margin: 0px 1px 0px 1px;
+}
+
+.largemenubutton:hover {
+  background-color: deepskyblue;
+}
+
+.smallmenubutton:hover {
   background-color: deepskyblue;
 }
 
@@ -27,13 +41,14 @@ body {
 .submenu {
   display: block;
   height: 15px;
+  margin-top: 2px;
 }
 
 .submenubutton {
-  width: 145px;
-  height: 15px;
+  width: 130px;
+  height: 17px;
   background-color: gainsboro;
-  font-size: 10px;
+  font-size: 12px;
   display: inline-block;
   text-align: center;
   margin: 0px 1px 0px 1px;

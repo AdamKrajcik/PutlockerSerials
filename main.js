@@ -155,7 +155,7 @@ function generateMainMenu() {
 
     var btn = document.createElement('div');
     btn.innerHTML = 'Serials';
-    btn.className = 'menubutton';
+    btn.className = 'largemenubutton';
     btn.addEventListener('click',function() {
         clearPage();
         showSubmenu(generateSerialMenu());
@@ -165,10 +165,19 @@ function generateMainMenu() {
 	
     btn = document.createElement('div');
     btn.innerHTML = 'Latest';
-    btn.className = 'menubutton';
+    btn.className = 'largemenubutton';
     btn.addEventListener('click',function() {
         clearPage();
         checkForNew();});
+    menu.appendChild(btn);
+
+    btn = document.createElement('div');
+    btn.innerHTML = 'S';
+    btn.className = 'smallmenubutton';
+    btn.addEventListener('click',function() {
+        clearPage();
+        showSubmenu(generateSettingsMenu());
+    });
     menu.appendChild(btn);
 
 	return menu;

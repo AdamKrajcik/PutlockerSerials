@@ -139,37 +139,6 @@ function loadNextEpisode(name, season, episode) {
   xmlhttp.send();
 }
 
-/*
-function generateMainMenu() {
-  var btn;
-  var menu = document.getElementById('menu');
-  
-  btn = document.createElement('button');
-  btn.innerHTML = 'Serials';
-  btn.className = 'menubutton';
-  btn.addEventListener('click',function() { generateSerialMenu(); generateSerialsTable();});
-  menu.appendChild(btn);
-  
-  btn = document.createElement('button');
-  btn.innerHTML = 'Last';
-  btn.className = 'menubutton';
-  btn.addEventListener('click',generateLastTable);
-  menu.appendChild(btn);
-
-  btn = document.createElement('button');
-  btn.innerHTML = 'Latest';
-  btn.className = 'menubutton';
-  btn.addEventListener('click',checkForNew);
-  menu.appendChild(btn);
-  
-  //will be removed when ready when not needed
-  btn = document.createElement('button');
-  btn.innerHTML = 'S';
-  btn.className = 'menubutton';
-  btn.addEventListener('click', save);
-  menu.appendChild(btn);
-}*/
-
 // Generate menu
 
 function generateMainMenu() {
@@ -217,19 +186,10 @@ function generateSerialMenu() {
     btn.className = 'submenubutton';
     btn.addEventListener('click', function () {
         clearMain();
-	  document.getElementById('main').appendChild(createForm());
+	  showForm(createForm());
 	});
     menu.appendChild(btn);
-
-    btn = document.createElement('div');
-    btn.innerHTML = 'Delete';
-    btn.className = 'submenubutton';
-    btn.addEventListener('click', function () {
-        clearMain();
-        showTable(generateDeleteSerialsTable());
-    });
-    menu.appendChild(btn);
-
+    
 	return menu;
 }
 
@@ -242,7 +202,7 @@ function generateSettingsMenu() {
 	btn.innerHTML = 'Import';
 	btn.className = 'submenubutton';
     btn.addEventListener('cilck', function () {
-        clearMain();
+        //TODO implement import button
     });
 	menu.appendChild(btn);
 
@@ -250,7 +210,7 @@ function generateSettingsMenu() {
     btn.innerHTML = 'Export';
     btn.className = 'submenubutton';
     btn.addEventListener('click', function () {
-        clearMain();
+        //TODO implement export button
     });
     menu.appendChild(btn);
 	
@@ -272,19 +232,16 @@ function showTable(table) {
     document.getElementById('main').appendChild(table);
 }
 
-//TODO
-function showForm() {
-    
+function showForm(form) {
+    document.getElementById('main').appendChild(form);
 }
 
-//TODO
 function showExport() {
-    
+    //TODO implement export
 }
 
-//TODO
 function showImport() {
-    
+    //TODO implement Import
 }
 
 // Generate table
@@ -300,20 +257,18 @@ function generateSerialsTable() {
 
 		td.innerHTML =  serialList[i].fullName;
 		td.className = 'tableitem';
+		td.id = i;
 		td.addEventListener('click', function () {
 			clearMain();
-			document.getElementById('main').appendChild(createForm());});
+			var form = createForm();
+			fillForm(form, this.id);
+            lockForm(form);
+            showForm(form);
+		});
 		tr.appendChild(td);
 		tb.appendChild(tr);
 	}
 	return tb;
-}
-
-//TODO
-function generateDeleteSerialsTable() {
-    var tb = document.createElement('tb');
-
-    return tb;
 }
 
 function generateLastTable() {
@@ -325,14 +280,17 @@ function generateLastTable() {
         
         td = document.createElement('td');
         td.innerHTML = serialList[i].fullName;
+        td.className = 'nametableitem';
         tr.appendChild(td);
 
         td = document.createElement('td');
         td.innerHTML = ' Ep ' + serialList[i].episode;
+        td.className = 'episodetableitem';
         tr.appendChild(td);
 
         td = document.createElement('td');
         td.innerHTML = ' Se ' + serialList[i].season;
+        td.className = 'seasontableitem';
         tr.appendChild(td);
         
         tb.appendChild(tr);
@@ -347,7 +305,7 @@ function generateNewSerialsTable() {
 }
 
 function addItemToNewSerialsTable(item) {
-    
+    //TODO implement new method of latest serials
 }
 
 // Utilities
@@ -364,7 +322,7 @@ function createLink(linkName, season, episode) {
   return 'http://putlocker.is/watch-' + linkName + '-tvshow-season-' + season + '-episode-' + episode + '-online-free-putlocker.html';
 }
 
-//TODO
+//TODO find explicit usage
 function fullName(serial) {
   var xmlhttp;
   var patt = "Watch (.+) Season";
@@ -390,13 +348,12 @@ function fullName(serial) {
   xmlhttp.send();
 }
 
-function linkName(serial) {
-  return serial.linkName = serial.fullName.replace(/\W+/g, '-').toLowerCase();
+function linkName(fullname) {
+  return fullname.replace(/\W+/g, '-').toLowerCase();
 }
 
 // Form operations
 
-//TODO
 function createForm() {
 	var form = document.createElement('div');
 	
@@ -407,13 +364,17 @@ function createForm() {
 	span.innerHTML = 'Full name: ';
 	var input = document.createElement('input');
 	input.type = 'text';
-	input.name = 'text';
+	input.name = 'input';
     input.id = 'fullname';
+    input.addEventListener('input', function () {
+        document.getElementById('linkname').value = linkName(this.value);
+    });
 	input.style.margin = '4px';
 	input.style.marginLeft = '7px';
 	var checkbox = document.createElement('input');
 	checkbox.type = 'checkbox';
 	checkbox.id = 'checkFull';
+	checkbox.disabled = true;  // implemented in future
 	form.appendChild(span);
 	form.appendChild(input);
 	form.appendChild(checkbox);
@@ -424,12 +385,13 @@ function createForm() {
 
 	input = document.createElement('input');
 	input.type = 'text';
-	input.name = 'text';
+	input.name = 'input';
     input.id = 'linkname';
 	input.style.margin = '4px';
 	checkbox = document.createElement('input');
 	checkbox.type = 'checkbox';
 	checkbox.id = 'checkLink';
+	checkbox.disabled = true;  // implemented in future
 	form.appendChild(span);
 	form.appendChild(input);
 	form.appendChild(checkbox);
@@ -439,7 +401,7 @@ function createForm() {
 	span.innerHTML = 'Episode: ';
 	input = document.createElement('input');
 	input.type = 'text';
-	input.name = 'numeric';
+	input.name = 'input';
     input.id = 'episode';
 	input.style.width = '20px';
 	input.style.margin = '4px';
@@ -452,7 +414,7 @@ function createForm() {
 	span.innerHTML = 'Season: ';
 	input = document.createElement('input');
 	input.type = 'text';
-	input.name = 'numeric';
+	input.name = 'input';
     input.id = 'season';
 	input.style.width = '20px';
 	input.style.margin = '4px';
@@ -460,6 +422,7 @@ function createForm() {
 	checkbox = document.createElement('input');
 	checkbox.type = 'checkbox';
 	checkbox.id = 'latest';
+	checkbox.disabled = true;  // implemented in future
 	form.appendChild(span);
 	form.appendChild(input);
 	form.appendChild(checkbox);
@@ -468,18 +431,47 @@ function createForm() {
 	var btn = document.createElement('button');
 	btn.id = 'create';
 	btn.innerHTML = 'Create';
-	btn.style.margin = '6px 4px 0px 0px';
+	btn.style.margin = '6px 0px 0px 0px';
 	btn.addEventListener('click', function () {
-
+		if (checkForm(form) && this.innerHTML === 'Create') {
+			serialList.push(parseForm(form));
+			save();
+            clearMain();
+            showTable(generateSerialsTable());
+	    }
 	});
+    btn.addEventListener('click', function () {
+        if (this.innerHTML === 'Update') {
+            unlockForm(form);
+            this.innerHTML = 'Save';
+        }
+    });
+
+    btn.addEventListener('click', function () {
+        if (this.innerHTML === 'Save') {
+
+        }
+    });
     form.appendChild(btn);
 
 	btn = document.createElement('button');
 	btn.id = 'clear';
 	btn.innerHTML = 'Clear';
-	btn.style.margin = '6px 0px 0px 5px';
+    btn.name = 'clear';
+	btn.style.margin = '6px 0px 0px 9px';
 	btn.addEventListener('click', function () {
-		clearForm(form);
+		if (this.innerHTML = 'Clear') {
+			clearForm();
+		}
+	});
+
+	btn.addEventListener('click', function () {
+		if (this.innerHTML = 'Delete') {
+			serialList.slice(id, 1),
+			save();
+			clearMain();
+			showTable(generateSerialsTable());
+		}
 	});
 	form.appendChild(btn);
 
@@ -495,33 +487,66 @@ function createForm() {
 	return form;
 }
 
-//TODO
-function fillForm(form, serial) {
+function fillForm(form, id) {
+    var inputs = form.getElementsByTagName('input');
+	inputs[0].value = serialList[id].fullName;
+	inputs[2].value = serialList[id].linkName;
+	inputs[4].value = serialList[id].episode;
+	inputs[5].value = serialList[id].season;
 
+    form.getElementsByTagName('button')[0].innerHTML = 'Update';
+	form.getElementsByTagName('button')[0].innerHTML = 'Delete';
 }
 
-//TODO
 function lockForm(form) {
 	var inputs = form.getElementsByTagName('input');
-}
 
-//TODO
-function unlockForm(form) {
-
-}
-
-//TODO
-function parseForm(form) {
-	var fullName, linkName, episode, season;
-
-	if (form.getElementsByName('fullName').value == '') {
-		alert('Error in fullName');
+	for (var i = 0; i < inputs.length; i++ ) {
+        if (inputs[i].name === 'input') {
+            inputs[i].disabled = true;
+        }
 	}
+
+	//form.getElementsByTagName('button')[1].disabled = true;
 }
 
-//TODO
-function clearForm() {
-    
+function unlockForm(form) {
+	var inputs = form.getElementsByTagName('input');
+
+	for (var i = 0; i < inputs.length; i++ ) {
+		inputs[i].disabled = false;
+	}
+
+    //form.getElementsByTagName('button')[1].disabled = false;
+}
+
+function parseForm(form) {
+    var inputs = form.getElementsByTagName('input');
+	var serial = {
+		fullName : inputs[0].value,
+		linkName : inputs[2].value,
+		episode : parseInt(inputs[4].value),
+		season : parseInt(inputs[5].value)
+	};
+
+	return serial;
+}
+
+function clearForm(form) {
+    var inputs = form.getElementsByTagName('input');
+
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].type === 'text') {
+            inputs[i].value = '';
+        } else {
+            inputs[i].checked = false;
+        }
+    }
+}
+
+function checkForm(form) {
+    //TODO implement checking of forms
+    return true;
 }
 
 //Clearing

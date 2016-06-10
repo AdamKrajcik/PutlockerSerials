@@ -39,15 +39,15 @@ body {
 }
 
 .submenubutton:hover {
-  background-color: deepskyblue;
+  background-color: lightskyblue;
 }
 
 td.tableitem {
-
+  font-size: 16px;
 }
 
 td.tableitem:hover {
-
+  background-color: gainsboro;
 }
 
 .form {
@@ -57,4 +57,21 @@ td.tableitem:hover {
 
 #main {
   margin-top: 5px;
+  margin-left: 2px;
+}
+
+td.nametableitem {
+  font-size: 16px;
+  width: 200px;
+}
+
+td.episodetableitem {
+  margin-left: 10px;
+  font-size: 16px;
+  width: 50px;
+}
+
+td.seasontableitem {
+  margin-left: 10px;
+  font-size: 16px;
 }

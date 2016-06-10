@@ -94,14 +94,29 @@ function loadNextEpisode(name, season, episode) {
   
   xmlhttp.onreadystatechange = function() {
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        var tr, btn, td;
+        var tr, btn, td, a;
 	    tr = document.createElement('tr');
         tr.className = 'serialtablerow';
         tr.id = name;
 
 	  td = document.createElement('td');
         td.className = 'nametableitem';
-	  td.innerHTML = '<a href="' + createLink(name, season, episode) + '" target="_blank">' + findSerialInArray(name).fullName + '</a>'; //TO be rewritten
+        btn = document.createElement('div');
+        btn.className = 'watched';
+        btn.addEventListener('click', function() {
+            var s = findSerialInArray(name);
+            s.episode = episode;
+            s.season = season;
+            save();
+            document.getElementById('tb').removeChild(document.getElementById(s.linkName));
+        });
+
+        td.appendChild(btn);
+        a = document.createElement('a');
+        a.href = createLink(name, season, episode);
+        a.target = '_blank';
+        a.innerHTML = findSerialInArray(name).fullName; //TO be rewritten
+        td.appendChild(a);
 	  tr.appendChild(td);
 
 	  td = document.createElement('td');
@@ -112,21 +127,6 @@ function loadNextEpisode(name, season, episode) {
 	  td = document.createElement('td');
         td.className = 'seasontableitem';
 	  td.innerHTML = 'Se  ' + season;
-	  tr.appendChild(td);
-
-	  td = document.createElement('td');
-
-        btn = document.createElement('div');
-        btn.className = 'watched';
-        btn.addEventListener('click', function() {
-          var s = findSerialInArray(name);
-          s.episode = episode;
-          s.season = season;
-          save();
-          document.getElementById('tb').removeChild(document.getElementById(s.linkName));
-
-      });
-	  td.appendChild(btn);
 	  tr.appendChild(td);
 
 	  document.getElementById('tb').appendChild(tr);

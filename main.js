@@ -94,32 +94,39 @@ function loadNextEpisode(name, season, episode) {
   
   xmlhttp.onreadystatechange = function() {
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-	  var tr = document.createElement('tr');
-	  var bt = document.createElement('button');
-	  var td;
+        var tr, btn, td;
+	    tr = document.createElement('tr');
+        tr.className = 'serialtablerow';
+        tr.id = name;
 
 	  td = document.createElement('td');
-	  td.innerHTML = '<a href="' + createLink(name, season, episode) + '" target="_blank">' + findSerialInArray(name).fullName + '</a>';
+        td.className = 'nametableitem';
+	  td.innerHTML = '<a href="' + createLink(name, season, episode) + '" target="_blank">' + findSerialInArray(name).fullName + '</a>'; //TO be rewritten
 	  tr.appendChild(td);
 
 	  td = document.createElement('td');
+        td.className = 'episodetableitem';
 	  td.innerHTML = 'Ep  ' + episode;
 	  tr.appendChild(td);
 
 	  td = document.createElement('td');
+        td.className = 'seasontableitem';
 	  td.innerHTML = 'Se  ' + season;
 	  tr.appendChild(td);
 
 	  td = document.createElement('td');
-	  bt.innerHTML = 'Watched';
-	  bt.addEventListener('click', function() { var s = findSerialInArray(name);
-												s.episode = episode;
-												s.season = season;
-												bt.disabled = true;
-											  }
-						  );
-	  td.appendChild(bt);
+
+        btn = document.createElement('div');
+        btn.className = 'watched';
+        btn.addEventListener('click', function() {
+          var s = findSerialInArray(name);
+          s.episode = episode;
+          s.season = season;
+          save();
+          document.getElementById('tb').removeChild(document.getElementById(s.linkName));
+
+      });
+	  td.appendChild(btn);
 	  tr.appendChild(td);
 
 	  document.getElementById('tb').appendChild(tr);
@@ -155,16 +162,7 @@ function generateMainMenu() {
         showTable(generateSerialsTable());
     });
     menu.appendChild(btn);
-
-    btn = document.createElement('div');
-    btn.innerHTML = 'Last';
-    btn.className = 'menubutton';
-    btn.addEventListener('click',function() {
-        clearPage();
-        showTable(generateLastTable());
-    });
-    menu.appendChild(btn);
-
+	
     btn = document.createElement('div');
     btn.innerHTML = 'Latest';
     btn.className = 'menubutton';
@@ -248,54 +246,38 @@ function showImport() {
 
 function generateSerialsTable() {
 	var tb, tr, td;
-	
 	tb = document.createElement('tb');
 
 	for (var i = 0; i < serialList.length; i++) {
 		tr = document.createElement('tr');
+		tr.className = 'serialtablerow';
+		
 		td = document.createElement('td');
-
-		td.innerHTML =  serialList[i].fullName;
-		td.className = 'tableitem';
+		td.innerHTML = serialList[i].fullName;
+		td.className = 'nametableitem';
 		td.id = i;
 		td.addEventListener('click', function () {
 			clearMain();
 			var form = createForm();
 			fillForm(form, this.id);
-            lockForm(form);
-            showForm(form);
+			lockForm(form);
+			showForm(form);
 		});
 		tr.appendChild(td);
+
+		td = document.createElement('td');
+		td.innerHTML = ' Ep ' + serialList[i].episode;
+		td.className = 'episodetableitem';
+		tr.appendChild(td);
+
+		td = document.createElement('td');
+		td.innerHTML = ' Se ' + serialList[i].season;
+		td.className = 'seasontableitem';
+		tr.appendChild(td);
+
 		tb.appendChild(tr);
 	}
 	return tb;
-}
-
-function generateLastTable() {
-    var tb, tr, td;
-    tb = document.createElement('tb');
-    
-    for (var i = 0; i < serialList.length; i++) {
-	    tr = document.createElement('tr');
-        
-        td = document.createElement('td');
-        td.innerHTML = serialList[i].fullName;
-        td.className = 'nametableitem';
-        tr.appendChild(td);
-
-        td = document.createElement('td');
-        td.innerHTML = ' Ep ' + serialList[i].episode;
-        td.className = 'episodetableitem';
-        tr.appendChild(td);
-
-        td = document.createElement('td');
-        td.innerHTML = ' Se ' + serialList[i].season;
-        td.className = 'seasontableitem';
-        tr.appendChild(td);
-        
-        tb.appendChild(tr);
-    }
-  return tb;
 }
 
 function generateNewSerialsTable() {
@@ -457,17 +439,16 @@ function createForm() {
 	btn = document.createElement('button');
 	btn.id = 'clear';
 	btn.innerHTML = 'Clear';
-    btn.name = 'clear';
 	btn.style.margin = '6px 0px 0px 9px';
 	btn.addEventListener('click', function () {
-		if (this.innerHTML = 'Clear') {
+		if (this.innerHTML === 'Clear') {
 			clearForm();
 		}
 	});
 
 	btn.addEventListener('click', function () {
-		if (this.innerHTML = 'Delete') {
-			serialList.slice(id, 1),
+		if (this.innerHTML === 'Delete') {
+			serialList.splice(this.name, 1);
 			save();
 			clearMain();
 			showTable(generateSerialsTable());
@@ -495,7 +476,8 @@ function fillForm(form, id) {
 	inputs[5].value = serialList[id].season;
 
     form.getElementsByTagName('button')[0].innerHTML = 'Update';
-	form.getElementsByTagName('button')[0].innerHTML = 'Delete';
+	form.getElementsByTagName('button')[1].innerHTML = 'Delete';
+	form.getElementsByTagName('button')[1].name = id;
 }
 
 function lockForm(form) {

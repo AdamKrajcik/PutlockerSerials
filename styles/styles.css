@@ -1,11 +1,12 @@
 /* CSS file placeholder. */
 body {
   width : 300px;
-  background-color: aliceblue;margin-left: 15px;
+  background-color: aliceblue;
+  margin-left: 15px;
 }
 
 .menubutton {
-  width: 96px;
+  width: 145px;
   height: 30px;
   background-color: gainsboro;
   font-size: 20px;
@@ -29,7 +30,7 @@ body {
 }
 
 .submenubutton {
-  width: 96px;
+  width: 145px;
   height: 15px;
   background-color: gainsboro;
   font-size: 10px;
@@ -42,11 +43,7 @@ body {
   background-color: lightskyblue;
 }
 
-td.tableitem {
-  font-size: 16px;
-}
-
-td.tableitem:hover {
+tr.serialtablerow:hover {
   background-color: gainsboro;
 }
 
@@ -74,4 +71,10 @@ td.episodetableitem {
 td.seasontableitem {
   margin-left: 10px;
   font-size: 16px;
+}
+
+div.watched {
+  height: 10px;
+  width: 10px;
+  background-color: black;
 }

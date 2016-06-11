@@ -73,19 +73,19 @@ tr.serialtablerow:hover {
 }
 
 td.nametableitem {
-  font-size: 16px;
+  font-size: 12px;
   width: 200px;
 }
 
 td.episodetableitem {
   margin-left: 10px;
-  font-size: 16px;
+  font-size: 14px;
   width: 50px;
 }
 
 td.seasontableitem {
   margin-left: 10px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 div.watched {

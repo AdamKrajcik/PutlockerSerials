@@ -75,11 +75,11 @@ function checkForNew() {
     for(var i = 0; i < serialList.length; i++) {
 	    var season = serialList[i].season;
 	    var episode = serialList[i].episode + 1;
-	    loadNextEpisode(serialList[i].linkName, season, episode);
+	    findNextEpisode(serialList[i].linkName, season, episode);
     }
 }
 
-function loadNextEpisode(name, season, episode) {
+function findNextEpisode(linkName, season, episode) {
 
   var xmlhttp;
   
@@ -94,56 +94,26 @@ function loadNextEpisode(name, season, episode) {
   
   xmlhttp.onreadystatechange = function() {
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        var tr, btn, td, a;
-	    tr = document.createElement('tr');
-        tr.className = 'serialtablerow';
-        tr.id = name;
-
-	  td = document.createElement('td');
-        td.className = 'nametableitem';
-        btn = document.createElement('div');
-        btn.className = 'watched';
-        btn.addEventListener('click', function() {
-            var s = findSerialInArray(name);
-            s.episode = episode;
-            s.season = season;
-            save();
-            document.getElementById('tb').removeChild(document.getElementById(s.linkName));
-        });
-
-        td.appendChild(btn);
-        a = document.createElement('a');
-        a.href = createLink(name, season, episode);
-        a.target = '_blank';
-        a.innerHTML = findSerialInArray(name).fullName; //TO be rewritten
-        td.appendChild(a);
-	  tr.appendChild(td);
-
-	  td = document.createElement('td');
-        td.className = 'episodetableitem';
-	  td.innerHTML = 'Ep  ' + episode;
-	  tr.appendChild(td);
-
-	  td = document.createElement('td');
-        td.className = 'seasontableitem';
-	  td.innerHTML = 'Se  ' + season;
-	  tr.appendChild(td);
-
-	  document.getElementById('tb').appendChild(tr);
-
-	  loadNextEpisode(name, season, episode + 1);
+        addItemToNewSerialsTable(linkName, season, episode);
 	} else if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
 	  if (episode === 1) {
 	  } else {
 		season++;
 		episode = 1;
-		loadNextEpisode(name, season, episode);
+		findNextEpisode(linkName, season, episode);
 	  }
 	}
   };
   
-  xmlhttp.open('GET', createLink(name, season, episode), true);
+  xmlhttp.open('GET', createLink(linkName, season, episode), true);
   xmlhttp.send();
+}
+
+function nextEpisodeOfSerial(linkName) {
+	var serial = findSerialInArray(linkName);
+	var episode = serial.episode + 1;
+	var season = serial.season;
+	findNextEpisode(linkName, season, episode);
 }
 
 // Generate menu
@@ -295,8 +265,44 @@ function generateNewSerialsTable() {
 	return tb;
 }
 
-function addItemToNewSerialsTable(item) {
-    //TODO implement new method of latest serials
+function addItemToNewSerialsTable(name, season, episode) {
+	var tr, btn, td, a;
+	tr = document.createElement('tr');
+	tr.className = 'serialtablerow';
+	tr.id = name;
+
+	td = document.createElement('td');
+	td.className = 'nametableitem';
+	btn = document.createElement('div');
+	btn.className = 'watched';
+	btn.addEventListener('click', function() {
+		var s = findSerialInArray(name);
+		s.episode = episode;
+		s.season = season;
+		save();
+		document.getElementById('tb').removeChild(document.getElementById(s.linkName));
+		nextEpisodeOfSerial(name);
+	});
+
+	td.appendChild(btn);
+	a = document.createElement('a');
+	a.href = createLink(name, season, episode);
+	a.target = '_blank';
+	a.innerHTML = findSerialInArray(name).fullName; //TO be rewritten
+	td.appendChild(a);
+	tr.appendChild(td);
+
+	td = document.createElement('td');
+	td.className = 'episodetableitem';
+	td.innerHTML = 'Ep  ' + episode;
+	tr.appendChild(td);
+
+	td = document.createElement('td');
+	td.className = 'seasontableitem';
+	td.innerHTML = 'Se  ' + season;
+	tr.appendChild(td);
+
+	document.getElementById('tb').appendChild(tr);
 }
 
 // Utilities

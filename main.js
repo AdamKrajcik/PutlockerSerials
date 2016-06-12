@@ -371,7 +371,7 @@ function createForm() {
 	btn.style.margin = '6px 0px 0px 9px';
 	btn.addEventListener('click', function () {
 		if (this.innerHTML === 'Clear') {
-			clearForm();
+			clearForm(form);
 		}
 	});
 	btn.addEventListener('click', function () {

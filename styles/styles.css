@@ -63,7 +63,7 @@ tr.serialtablerow:hover {
 }
 
 .form {
-  padding : 6px 0px 10px 20px;
+  padding : 6px 20px 10px 20px;
   display: block;
 }
 
@@ -95,4 +95,10 @@ div.watched {
   margin-right: 2px;
   border-top: 15px solid red;
   border-right: 15px solid transparent;
+}
+
+textarea.data {
+  width: 98%;
+  height: 250px;
+  display: block;
 }

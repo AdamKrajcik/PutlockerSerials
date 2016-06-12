@@ -21,55 +21,6 @@ function save() {
 	chrome.storage.local.set( {'serialList' : serialList }, function () { console.log('saved ' + new Date()); });
 }
 
-/*
-function findLastEpisode(name) {
-  var season = 1, episode = 1, tmp = 0;
-  initEpisode(name, season, episode, tmp);
-}
-
-function initEpisode(name, season, episode, tmp, serials) {
-  var xmlhttp;
-  
-  if (window.XMLHttpRequest)
-  {
-	xmlhttp = new XMLHttpRequest();
-  } 
-  else
-  {
-	xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-  }
-  
-  xmlhttp.onreadystatechange = function() {
-	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-	  tmp = episode;
-	  episode++;
-	  initEpisode(name, season, episode, tmp);
-	} else if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
-	  if (episode == 1) {
-		season--;
-		episode = tmp;
-
-		var curr = { name : name,
-					 fullName : name,
-					 episode : episode,
-		  season : season
-				   };
-				   serialList.push(curr);
-		console.log(curr);
-		if (serials.length === serialList.length) {save();document.getElementById('menu').innerHTML = 'Initialization completed.';}
-	  } else {
-		season++;
-		episode = 1;
-		initEpisode(name, season, episode, tmp);
-	  }
-	}
-  };
-  
-  xmlhttp.open('GET', createLink(name, season, episode), true);
-  xmlhttp.send();
-}
-*/
-
 function checkForNew() {
 	showTable(generateNewSerialsTable());
     for(var i = 0; i < serialList.length; i++) {
@@ -162,7 +113,6 @@ function generateSerialMenu() {
     btn.innerHTML = 'New';
     btn.className = 'submenubutton';
     btn.addEventListener('click', function () {
-        clearMain();
 	  showForm(createForm());
 	});
     menu.appendChild(btn);
@@ -178,8 +128,8 @@ function generateSettingsMenu() {
 	var btn = document.createElement('div');
 	btn.innerHTML = 'Import';
 	btn.className = 'submenubutton';
-    btn.addEventListener('cilck', function () {
-        //TODO implement import button
+    btn.addEventListener('click', function () {
+        showForm(createImportForm());
     });
 	menu.appendChild(btn);
 
@@ -187,7 +137,7 @@ function generateSettingsMenu() {
     btn.innerHTML = 'Export';
     btn.className = 'submenubutton';
     btn.addEventListener('click', function () {
-        //TODO implement export button
+		showForm(createExportForm());
     });
     menu.appendChild(btn);
 	
@@ -197,6 +147,7 @@ function generateSettingsMenu() {
 // Show menu
 
 function showMainMenu() {
+    clearPage();
 	document.getElementById('head').appendChild(generateMainMenu());
 }
 
@@ -206,19 +157,13 @@ function showSubmenu(submenu) {
 }
 
 function showTable(table) {
+    clearMain();
     document.getElementById('main').appendChild(table);
 }
 
 function showForm(form) {
+    clearMain();
     document.getElementById('main').appendChild(form);
-}
-
-function showExport() {
-    //TODO implement export
-}
-
-function showImport() {
-    //TODO implement Import
 }
 
 // Generate table
@@ -236,7 +181,6 @@ function generateSerialsTable() {
 		td.className = 'nametableitem';
 		td.id = i;
 		td.addEventListener('click', function () {
-			clearMain();
 			var form = createForm();
 			fillForm(form, this.id);
 			lockForm(form);
@@ -319,34 +263,17 @@ function createLink(linkName, season, episode) {
   return 'http://putlocker.is/watch-' + linkName + '-tvshow-season-' + season + '-episode-' + episode + '-online-free-putlocker.html';
 }
 
-//TODO find explicit usage
-function fullName(serial) {
-  var xmlhttp;
-  var patt = "Watch (.+) Season";
-  
-  if (window.XMLHttpRequest)
-  {
-	xmlhttp = new XMLHttpRequest();
-  } 
-  else
-  {
-	xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-  }
-  
-  xmlhttp.onreadystatechange = function() {
-	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-	  var doc = (new DOMParser()).parseFromString(xmlhttp.responseText,"text/html");
-	  var fullName = doc.getElementById('title').match(patt)[1];
-	  serial.fullName = fullName;
-	}
-  };
-  
-  xmlhttp.open('GET', createLink(serial.linkName, 1, 1), true);
-  xmlhttp.send();
-}
-
 function linkName(fullname) {
   return fullname.replace(/\W+/g, '-').toLowerCase();
+}
+
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }
 
 // Form operations
@@ -368,13 +295,8 @@ function createForm() {
     });
 	input.style.margin = '4px';
 	input.style.marginLeft = '7px';
-	var checkbox = document.createElement('input');
-	checkbox.type = 'checkbox';
-	checkbox.id = 'checkFull';
-	checkbox.disabled = true;  // implemented in future
 	form.appendChild(span);
 	form.appendChild(input);
-	form.appendChild(checkbox);
 	form.appendChild(document.createElement('br'));
 
 	span = document.createElement('span');
@@ -385,13 +307,8 @@ function createForm() {
 	input.name = 'input';
     input.id = 'linkname';
 	input.style.margin = '4px';
-	checkbox = document.createElement('input');
-	checkbox.type = 'checkbox';
-	checkbox.id = 'checkLink';
-	checkbox.disabled = true;  // implemented in future
 	form.appendChild(span);
 	form.appendChild(input);
-	form.appendChild(checkbox);
 	form.appendChild(document.createElement('br'));
 
 	span = document.createElement('span');
@@ -416,13 +333,8 @@ function createForm() {
 	input.style.width = '20px';
 	input.style.margin = '4px';
 	input.style.marginLeft = '17px';
-	checkbox = document.createElement('input');
-	checkbox.type = 'checkbox';
-	checkbox.id = 'latest';
-	checkbox.disabled = true;  // implemented in future
 	form.appendChild(span);
 	form.appendChild(input);
-	form.appendChild(checkbox);
 	form.appendChild(document.createElement('br'));
 
 	var btn = document.createElement('button');
@@ -437,6 +349,13 @@ function createForm() {
             showTable(generateSerialsTable());
 	    }
 	});
+	btn.addEventListener('click', function () {
+		if (this.innerHTML === 'Save' && checkForm(form)) {
+			serialList[this.name] = parseForm(form);
+			save();
+			showTable(generateSerialsTable());
+		}
+	});
     btn.addEventListener('click', function () {
         if (this.innerHTML === 'Update') {
             unlockForm(form);
@@ -444,11 +363,6 @@ function createForm() {
         }
     });
 
-    btn.addEventListener('click', function () {
-        if (this.innerHTML === 'Save') {
-
-        }
-    });
     form.appendChild(btn);
 
 	btn = document.createElement('button');
@@ -460,12 +374,10 @@ function createForm() {
 			clearForm();
 		}
 	});
-
 	btn.addEventListener('click', function () {
 		if (this.innerHTML === 'Delete') {
 			serialList.splice(this.name, 1);
 			save();
-			clearMain();
 			showTable(generateSerialsTable());
 		}
 	});
@@ -476,7 +388,6 @@ function createForm() {
 	btn.innerHTML = 'Back';
 	btn.style.margin = '6px 0px 0px 9px';
 	btn.addEventListener('click', function () {
-		clearMain();
 		showTable(generateSerialsTable());
 	});
 	form.appendChild(btn);
@@ -486,13 +397,15 @@ function createForm() {
 function fillForm(form, id) {
     var inputs = form.getElementsByTagName('input');
 	inputs[0].value = serialList[id].fullName;
-	inputs[2].value = serialList[id].linkName;
-	inputs[4].value = serialList[id].episode;
-	inputs[5].value = serialList[id].season;
+	inputs[1].value = serialList[id].linkName;
+	inputs[2].value = serialList[id].episode;
+	inputs[3].value = serialList[id].season;
 
     form.getElementsByTagName('button')[0].innerHTML = 'Update';
+	form.getElementsByTagName('button')[0].name = id;
 	form.getElementsByTagName('button')[1].innerHTML = 'Delete';
 	form.getElementsByTagName('button')[1].name = id;
+
 }
 
 function lockForm(form) {
@@ -521,9 +434,9 @@ function parseForm(form) {
     var inputs = form.getElementsByTagName('input');
 	var serial = {
 		fullName : inputs[0].value,
-		linkName : inputs[2].value,
-		episode : parseInt(inputs[4].value),
-		season : parseInt(inputs[5].value)
+		linkName : inputs[1].value,
+		episode : parseInt(inputs[2].value),
+		season : parseInt(inputs[3].value)
 	};
 
 	return serial;
@@ -533,17 +446,77 @@ function clearForm(form) {
     var inputs = form.getElementsByTagName('input');
 
     for (var i = 0; i < inputs.length; i++) {
-        if (inputs[i].type === 'text') {
-            inputs[i].value = '';
-        } else {
-            inputs[i].checked = false;
-        }
+		inputs[i].value = '';
     }
 }
 
 function checkForm(form) {
     //TODO implement checking of forms
     return true;
+}
+
+
+function createImportForm() {
+	var form = document.createElement('div');
+
+	form.id = 'form';
+	form.className = 'form';
+	var textarea = document.createElement('textarea');
+	textarea.className = 'data';
+    form.appendChild(textarea);
+
+    var btn = document.createElement('button');
+    btn.style.marginTop = '6px';
+    btn.innerHTML = 'Save';
+    btn.addEventListener('click', function () {
+        if (confirm('Warning! This process will delete all saved data. Do you wich to proceed')) {
+            if (IsJsonString(textarea.value)) {
+                serialList = JSON.parse(textarea.value);
+                save();
+                alert('Import complete.');
+                showTable(generateSerialsTable());
+            }
+            else {
+                alert('Error in JSON Import String.');
+            }
+        }
+    });
+    form.appendChild(btn);
+
+    btn = document.createElement('button');
+    btn.innerHTML = 'Back';
+    btn.style.margin = '6px 0px 0px 9px';
+    btn.addEventListener('click', function () {
+        showTable(generateSerialsTable());
+    });
+    form.appendChild(btn);
+
+    return form;
+}
+
+function createExportForm() {
+	var form = document.createElement('div');
+
+	form.id = 'form';
+	form.className = 'form';
+	var textarea = document.createElement('textarea');
+	textarea.className = 'data';
+    textarea.readOnly = true;
+	textarea.value = JSON.stringify(serialList);
+    textarea.addEventListener('click', function () {
+        this.select();
+    });
+
+	var btn = document.createElement('button');
+	btn.innerHTML = 'Back';
+    btn.style.marginTop = '6px';
+	btn.addEventListener('click', function () {
+		showTable(generateSerialsTable());
+	});
+
+	form.appendChild(textarea);
+	form.appendChild(btn);
+	return form;
 }
 
 //Clearing
@@ -563,3 +536,4 @@ function clearPage() {
 function clearMain() {
     document.getElementById('main').innerHTML = '';
 }
+

@@ -8,6 +8,7 @@ window.onload = function() {
         if (serialList === undefined) {
             serialList = [];
             console.log('No save or first run at ' + new Date());
+			showMainMenu();
         }
         else {
             console.log('Load completed at ' + new Date());
@@ -85,7 +86,7 @@ function generateMainMenu() {
     menu.appendChild(btn);
 	
     btn = document.createElement('div');
-    btn.innerHTML = 'Latest';
+    btn.innerHTML = 'Next';
     btn.className = 'largemenubutton';
     btn.addEventListener('click',function() {
         clearPage();

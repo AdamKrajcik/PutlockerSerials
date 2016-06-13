@@ -74,7 +74,7 @@ tr.serialtablerow:hover {
 
 td.nametableitem {
   font-size: 12px;
-  width: 200px;
+  width: 210px;
 }
 
 td.episodetableitem {
@@ -93,8 +93,8 @@ div.watched {
   height: 0px;
   width: 0px;
   margin-right: 2px;
-  border-top: 15px solid red;
-  border-right: 15px solid transparent;
+  border-top: 12px solid red;
+  border-right: 12px solid transparent;
 }
 
 textarea.data {

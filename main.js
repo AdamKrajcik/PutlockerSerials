@@ -2,7 +2,7 @@ var serialList = [];
 
 window.onload = function() {
     //noinspection JSUnresolvedVariable
-    chrome.storage.local.get(['serialList'], function(result) {
+    chrome.storage.sync.get(['serialList'], function(result) {
         serialList = result.serialList;
 
         if (serialList === undefined) {
@@ -19,7 +19,7 @@ window.onload = function() {
 
 function save() {
 	//noinspection JSUnresolvedVariable
-	chrome.storage.local.set( {'serialList' : serialList }, function () { console.log('saved ' + new Date()); });
+	chrome.storage.sync.set( {'serialList' : serialList }, function () { console.log('saved ' + new Date()); });
 }
 
 function checkForNew() {

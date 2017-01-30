@@ -459,12 +459,34 @@ function checkForm(form) {
 
 function createImportForm() {
 	var form = document.createElement('div');
-
+  
 	form.id = 'form';
 	form.className = 'form';
+	
 	var textarea = document.createElement('textarea');
+	var chooseFile = document.createElement('input');
+	chooseFile.type = 'file';
+	chooseFile.id = 'fileInput';
+	chooseFile.addEventListener('change', function(e) {
+	  if (chooseFile.files[0].type.match(/text.*/)) {
+				var reader = new FileReader();
+
+				reader.onload = function(e) {
+					textArea.value = reader.result;
+				};
+				
+				reader.readAsText(chooseFile.files[0]);	
+	  } else {
+	    conslole.log('Error when reading file:' + chooseFile.files[0]);
+	  }
+	});
+	
+	form.appendChild(chooseFile);
+	
+	
 	textarea.className = 'data';
-    form.appendChild(textarea);
+	textarea.id = 'textArea';
+  form.appendChild(textarea);
 
     var btn = document.createElement('button');
     btn.style.marginTop = '6px';

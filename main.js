@@ -134,7 +134,7 @@ function generateSettingsMenu() {
     });
 	menu.appendChild(btn);
 
-    var btn = document.createElement('div');
+    btn = document.createElement('div');
     btn.innerHTML = 'Export';
     btn.className = 'submenubutton';
     btn.addEventListener('click', function () {
@@ -261,7 +261,8 @@ function findSerialInArray(linkName) {
 }
 
 function createLink(linkName, season, episode) {
-  return 'http://putlocker.is/watch-' + linkName + '-tvshow-season-' + season + '-episode-' + episode + '-online-free-putlocker.html';
+  //return 'http://putlocker.ist/watch-' + linkName + '-tvshow-season-' + season + '-episode-' + episode + '-online-free-putlocker.html';
+  return 'http://putlocker.ist/' + linkName + '-season-' + season + '-episode-' + episode + '/';
 }
 
 function linkName(fullname) {
